@@ -1,8 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import type { SVGProps } from "react";
 
-type IconProps = JSX.IntrinsicElements["svg"];
+type IconProps = SVGProps<SVGSVGElement>;
 
 function PlayIcon(props: IconProps) {
   return (
@@ -79,22 +80,32 @@ export function WorkScrollIndicator({ variant = "work" }: { variant?: "work" | "
     if (!scrollEl || !track) return;
 
     function updateIndicators() {
-      const scrollLeft = scrollEl.scrollLeft;
-      const maxScrollLeft = scrollEl.scrollWidth - scrollEl.clientWidth;
+      const el = scrollEl;
+      if (!el) {
+        rafRef.current = null;
+        return;
+      }
+      const trackEl = trackRef.current;
+      if (!trackEl) {
+        rafRef.current = null;
+        return;
+      }
+      const scrollLeft = el.scrollLeft;
+      const maxScrollLeft = el.scrollWidth - el.clientWidth;
       const atEnd = maxScrollLeft <= 0 || scrollLeft >= maxScrollLeft - 1;
-      const viewportCenter = scrollLeft + scrollEl.clientWidth / 2;
+      const viewportCenter = scrollLeft + el.clientWidth / 2;
       let baseIndex = 0;
       let progress = 0;
       let hasNext = false;
-      const buttons = track.querySelectorAll<HTMLButtonElement>(".scroll-indicator-item");
+      const buttons = trackEl.querySelectorAll<HTMLButtonElement>(".scroll-indicator-item");
 
-      const scrollRect = scrollEl.getBoundingClientRect();
+      const scrollRect = el.getBoundingClientRect();
       function centerInScrollContent(el: HTMLElement) {
         const rect = el.getBoundingClientRect();
         return scrollLeft + (rect.left - scrollRect.left) + rect.width / 2;
       }
 
-      const cards = Array.from(scrollEl.querySelectorAll<HTMLElement>(cardSelector));
+      const cards = Array.from(el.querySelectorAll<HTMLElement>(cardSelector));
       const threeItemCount = isWork2 ? WORK2_CARD_COUNT : DESKTOP_GROUP_COUNT;
 
       // Desktop with 3 groups: use progress-based pill/dot animation as you scroll
@@ -164,7 +175,7 @@ export function WorkScrollIndicator({ variant = "work" }: { variant?: "work" | "
           btn.classList.toggle("scroll-indicator-dot", w <= DOT_SIZE);
         });
       } else if (!isDesktop) {
-        const cards = Array.from(scrollEl.querySelectorAll<HTMLElement>(cardSelector));
+        const cards = Array.from(el.querySelectorAll<HTMLElement>(cardSelector));
         if (!cards.length || !buttons.length) {
           rafRef.current = null;
           return;
@@ -189,7 +200,7 @@ export function WorkScrollIndicator({ variant = "work" }: { variant?: "work" | "
           btn.classList.toggle("scroll-indicator-dot", w <= DOT_SIZE);
         });
       } else {
-        const cards = scrollEl.querySelectorAll<HTMLElement>(cardSelector);
+        const cards = el.querySelectorAll<HTMLElement>(cardSelector);
         const group1Wrapper = cards[1]?.parentElement;
         if (!cards.length || cards.length < 4 || !group1Wrapper || !buttons.length) {
           rafRef.current = null;
@@ -244,6 +255,8 @@ export function WorkScrollIndicator({ variant = "work" }: { variant?: "work" | "
     const SCROLL_END_MS = 120;
 
     function onScroll() {
+      const el = scrollEl;
+      if (!el) return;
       if (rafRef.current !== null) return;
       rafRef.current = requestAnimationFrame(updateIndicators);
 
@@ -251,13 +264,13 @@ export function WorkScrollIndicator({ variant = "work" }: { variant?: "work" | "
         if (scrollEndTimer !== null) clearTimeout(scrollEndTimer);
         scrollEndTimer = setTimeout(() => {
           scrollEndTimer = null;
-          const cards = Array.from(scrollEl.querySelectorAll<HTMLElement>(cardSelector));
+          const cards = Array.from(el.querySelectorAll<HTMLElement>(cardSelector));
           if (cards.length < WORK2_CARD_COUNT) return;
-          const scrollRect = scrollEl.getBoundingClientRect();
-          const scrollLeft = scrollEl.scrollLeft;
-          const viewportCenter = scrollLeft + scrollEl.clientWidth / 2;
-          const halfView = scrollEl.clientWidth / 2;
-          const maxLeft = scrollEl.scrollWidth - scrollEl.clientWidth;
+          const scrollRect = el.getBoundingClientRect();
+          const scrollLeft = el.scrollLeft;
+          const viewportCenter = scrollLeft + el.clientWidth / 2;
+          const halfView = el.clientWidth / 2;
+          const maxLeft = el.scrollWidth - el.clientWidth;
           function centerInContent(el: HTMLElement) {
             const r = el.getBoundingClientRect();
             return scrollLeft + (r.left - scrollRect.left) + r.width / 2;
@@ -273,20 +286,20 @@ export function WorkScrollIndicator({ variant = "work" }: { variant?: "work" | "
             }
           }
           const targetLeft = Math.max(0, Math.min(centers[nearest] - halfView, maxLeft));
-          if (Math.abs(scrollEl.scrollLeft - targetLeft) > 4) {
-            scrollEl.scrollTo({ left: targetLeft, behavior: "smooth" });
+          if (Math.abs(el.scrollLeft - targetLeft) > 4) {
+            el.scrollTo({ left: targetLeft, behavior: "smooth" });
           }
         }, SCROLL_END_MS);
       } else if (isDesktop) {
         if (scrollEndTimer !== null) clearTimeout(scrollEndTimer);
         scrollEndTimer = setTimeout(() => {
           scrollEndTimer = null;
-          const cards = Array.from(scrollEl.querySelectorAll<HTMLElement>(cardSelector));
-          const scrollRect = scrollEl.getBoundingClientRect();
-          const scrollLeft = scrollEl.scrollLeft;
-          const viewportCenter = scrollLeft + scrollEl.clientWidth / 2;
-          const halfView = scrollEl.clientWidth / 2;
-          const maxLeft = scrollEl.scrollWidth - scrollEl.clientWidth;
+          const cards = Array.from(el.querySelectorAll<HTMLElement>(cardSelector));
+          const scrollRect = el.getBoundingClientRect();
+          const scrollLeft = el.scrollLeft;
+          const viewportCenter = scrollLeft + el.clientWidth / 2;
+          const halfView = el.clientWidth / 2;
+          const maxLeft = el.scrollWidth - el.clientWidth;
           function centerInContent(el: HTMLElement) {
             const r = el.getBoundingClientRect();
             return scrollLeft + (r.left - scrollRect.left) + r.width / 2;
@@ -303,8 +316,8 @@ export function WorkScrollIndicator({ variant = "work" }: { variant?: "work" | "
               }
             }
             const targetLeft = Math.max(0, Math.min(centers[nearest] - halfView, maxLeft));
-            if (Math.abs(scrollEl.scrollLeft - targetLeft) > 4) {
-              scrollEl.scrollTo({ left: targetLeft, behavior: "smooth" });
+            if (Math.abs(el.scrollLeft - targetLeft) > 4) {
+              el.scrollTo({ left: targetLeft, behavior: "smooth" });
             }
           } else {
             const group1Wrapper = cards[1]?.parentElement;
@@ -321,8 +334,8 @@ export function WorkScrollIndicator({ variant = "work" }: { variant?: "work" | "
               }
             }
             const targetLeft = Math.max(0, Math.min(centers[nearest] - halfView, maxLeft));
-            if (Math.abs(scrollEl.scrollLeft - targetLeft) > 4) {
-              scrollEl.scrollTo({ left: targetLeft, behavior: "smooth" });
+            if (Math.abs(el.scrollLeft - targetLeft) > 4) {
+              el.scrollTo({ left: targetLeft, behavior: "smooth" });
             }
           }
         }, SCROLL_END_MS);
