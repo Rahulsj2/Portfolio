@@ -461,6 +461,8 @@ export function A11yDriveCardAnimation() {
     exhaustTimer = 0;
 
     function render(ts: number) {
+      // TypeScript: ensure `ctx` is non-null inside this closure
+      if (!ctx) return;
       if (!startTime) {
         startTime = ts;
         lastTs = ts;
