@@ -40,10 +40,10 @@ export default function HomePage() {
               {/* Group 2: Prototyping line + bio paragraph */}
               <div className="flex flex-col gap-md">
                 <p className="text-[4.5rem] font-light tracking-tight leading-[1.1]" style={{ color: "#1d1d1f" }}>
-                  Prototyping A11y experiences for iOS <br /> and enterprise tools
+                  Designing A11y experiences for iOS <br /> and enterprise tools
                 </p>
                 <p className="text-body leading-relaxed max-w-2xl" style={{ color: "#1d1d1f" }}>
-                  A UX engineer focused on bringing early-stage ideas to life — designing and prototyping AI-assisted platforms and consumer workflows with a systems mindset and an appreciation for technical constraints.
+                  A UX designer focused on bringing early-stage ideas to life — designing and prototyping AI-assisted platforms and consumer workflows with a systems mindset and an appreciation for technical constraints.
                 </p>
               </div>
 
